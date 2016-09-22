@@ -1,7 +1,7 @@
 <%-- page directive --%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8" 
-	import="code.BeanForm"%>
+	import="code.BeanForm,java.util.List,java.util.ArrayList"%>
 <!DOCTYPE html">
 <html>
 <head>
@@ -15,14 +15,26 @@
 	<%-- scriptlet--%>
 	<%
 		String sLastName = (String) session.getAttribute("lastName");
+		
 		String sEmail = (String) request.getParameter("email");
 		String sName = request.getParameter("name");
+		
+		
 	%>
 	<%-- jsp actions--%>
 	<jsp:useBean id="formReceived" class="code.BeanForm"> 
 	<jsp:setProperty name="formReceived" property="*" />
 	</jsp:useBean>
 	
+	<%
+	List<BeanForm> lUsers  = 
+	(List<BeanForm>) session.getAttribute("users");
+	
+	if (lUsers==null)
+		lUsers = new ArrayList<BeanForm>();
+	if(!lUsers.contains(formReceived))
+		lUsers.add(formReceived);
+	%>
 	<!-- This is a comment that we can see -->
 	<%-- This is secret comment --%>
 	Client information:
@@ -36,12 +48,21 @@
 			<p>Hello <jsp:getProperty name="formReceived" property="name"/> </p>
 			<% 
 		} else {
-			out.print("<p>I don't know you.</p>");
+			out.println("<p>I don't know you.</p>");
 		}
-	%>
+		out.print("<ul>");
+		for(BeanForm user:lUsers){
+			out.print("<li>"+user+"</li>");
+		}
+		out.print("</ul>");
+
+		%>
+	
 	<%
 		if (!sName.equals(""))
 		session.setAttribute("lastName", sName);
+		session.setAttribute("users", lUsers);
+
 	%>
 </body>
 </html>
